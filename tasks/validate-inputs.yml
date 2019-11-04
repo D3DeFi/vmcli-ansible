@@ -1,0 +1,20 @@
+---
+# tasks file validating inputs from user and defaulting some variables
+- name: Fail if username and password are not provided
+  fail:
+    msg: 'ENV variables VMWARE_USER and VMWARE_PASSWORD not found'
+  when:
+    - vcenter_username|length == 0
+    - vcenter_password|length == 0
+  run_once: True
+
+- name: Fail if vCenter was not loaded from ENV or inventory
+  fail:
+    msg: 'No vCenter was specified. Either set ENV variable VMWARE_HOST or define vmware_vcenter in inventory file'
+  when:
+    - vcenter_hostname|length == 0
+
+- name: Load default values for vars that were not provided
+  set_fact:
+    vmware_vm_datacenter: "{{ vmware_vm_datacenter|default(vcenter_defaults[vcenter_hostname]['default_datacenter']) }}"
+    vmware_vm_cluster: "{{ vmware_vm_cluster|default(vcenter_defaults[vcenter_hostname]['default_cluster']) }}"

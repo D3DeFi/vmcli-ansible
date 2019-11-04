@@ -1,0 +1,74 @@
+---
+# defaults variables for vmware_vm role
+# see README.md for the examples
+
+# name of VM to create should usually match inventory_name, but there can be exceptions
+#! required for vmware_guest module
+vmware_vm_name: '{{ inventory_hostname }}'
+
+# template from which to clone the host
+#! required
+vmware_vm_template:
+
+# folder where to place VM needs to be defined as absolute path
+#! required for vmware_guest module
+vmware_vm_folder:
+
+# resource pool where to place VM
+# defaults to \Resources if not provided
+vmware_vm_resource_pool:
+
+# vCenter datacenter where to place VM to
+# defaults to ha-datacenter (vCenter default naming)
+# attempt is made to load default value from group_vars/all.yml based on vCenter user provided
+vmware_vm_datacenter:
+
+# vCenter cluster where to deploy VM to
+#! required for vmware_guest module
+# attempt is made to load default value from group_vars/<location> if correct location is provided in inventory
+vmware_vm_cluster:
+
+# vCenter datastore where to place VM files to
+# defaults to the same datastore or datastore cluster as template is using if not provided
+vmware_vm_datastore:
+
+## Network configuration of VM
+# at minimum a list of networks to attach to the host (portgroups or DVS portgroups)
+# supports customization - see parameter 'networks' in the docs:
+#   https://docs.ansible.com/ansible/latest/modules/vmware_guest_module.html
+#! required with a minimum of network names
+vmware_vm_networks: []
+# IP address in CIDR format to assign to VM (e.g. 10.1.1.2/24)
+# nw interface configuration is not handled via guest os customizations due to some distros being unsupported
+# by VMware. These values are configured to VM extra config and then loaded by custom provisioning
+# script placed in VM templates - see https://github.com/D3DeFi/vmcli-provision-scripts
+#! required
+vmware_vm_ip_cidr:
+# default gateway for the IP provided above
+#! required
+vmware_vm_ip_gw:
+
+## Hardware parameters for VM - see parameter 'hardware' in the docs:
+##   https://docs.ansible.com/ansible/latest/modules/vmware_guest_module.html
+# number of CPUs to add to VM
+vmware_vm_cpus: 1
+# number of virtual memory to add to VM in MegaBytes
+vmware_vm_memory_mb: 1024
+# type of SCSI controller on VMware. This default shouldn't be overriden without a good reason
+vmware_vm_scsi_type: paravirtual
+# a list of additional disks to add to the freshly cloned VM
+# a minimum of `size_(gb|tb|mb|kb)`is required per disks
+# vmware_vm_add_disks:
+#   - size_tb: 1
+#   - size_gb: 32
+# if `scsi_controller` and `unit_number` are not provided, custom plugin `to_vmware_disks` will try to assign them
+# consult https://docs.ansible.com/ansible/latest/modules/vmware_guest_disk_module.html for all available options
+vmware_vm_add_disks: []
+
+# a list of VMware tags to associate with VM
+vmware_vm_tags: []
+
+# by default, this role will fail if VM with the same name is found
+# set this to True if you want to reconfigure the VM
+# WARNING: This will power off VM before any action!
+vmware_vm_update_existing: False

@@ -1,0 +1,10 @@
+*.diff
+*.log
+*.patch
+*.retry
+*.swp
+*.pyc
+.vaultpass
+env
+debug.yml
+test.yml

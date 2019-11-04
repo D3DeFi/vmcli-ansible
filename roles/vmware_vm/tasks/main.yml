@@ -1,0 +1,89 @@
+--
+# main.yml tasks file for vmware_vm role
+- block:
+  - name: Fail if Virtual Machine already exists
+    vmware_guest_facts:
+      hostname: '{{ vcenter_hostname }}'
+      username: '{{ vcenter_username }}'
+      password: '{{ vcenter_password }}'
+      validate_certs: '{{ vcenter_validate_certs }}'
+      name: '{{ vmware_vm_name }}'
+      datacenter: '{{ vmware_vm_datacenter }}'
+      schema: vsphere
+      properties:
+        - config.name
+        - config.instanceUuid
+    failed_when: __existing_vm_facts.instance is defined
+    when: not vmware_vm_update_existing|bool
+    register: __existing_vm_facts
+
+  - name: Deploy Virtual Machine on vCenter
+    vmware_guest:
+      hostname: '{{ vcenter_hostname }}'
+      username: '{{ vcenter_username }}'
+      password: '{{ vcenter_password }}'
+      validate_certs: '{{ vcenter_validate_certs }}'
+      name: '{{ vmware_vm_name }}'
+      folder: '{{ vmware_vm_folder }}'
+      template: '{{ vmware_vm_template }}'
+      guest_id: '{{ vmware_vm_guestid_mappings[vmware_vm_template] }}'
+      datacenter: '{{ vmware_vm_datacenter }}'
+      datastore: '{{ vmware_vm_datastore }}'
+      cluster: '{{ vmware_vm_cluster }}'
+      resource_pool: '{{ vmware_vm_resource_pool }}'
+      networks: '{{ vmware_vm_networks }}'
+      hardware:
+        num_cpus: '{{ vmware_vm_cpus }}'
+        memory_mb: '{{ vmware_vm_memory_mb }}'
+        scsi: '{{ vmware_vm_scsi_type }}'
+        version: 13
+      customvalues:
+        - key: guestinfo.provision.enabled
+          value: "true"
+        - key: guestinfo.provision.network.address
+          value: '{{ vmware_vm_ip_cidr }}'
+        - key: guestinfo.provision.network.gateway
+          value: '{{ vmware_vm_ip_gw }}'
+      state: poweredoff
+
+  - name: Attach additional disks to Virtual Machine
+    block:
+      - name: Convert list of disks to format expected by vmware_guest_disk
+        set_fact:
+          vmware_vm_add_disks: '{{ vmware_vm_add_disks|to_vmware_disks(datastore=vmware_vm_datastore) }}'
+
+      - name: Add additional disks to Virtual Machine
+        vmware_guest_disk:
+          hostname: '{{ vcenter_hostname }}'
+          username: '{{ vcenter_username }}'
+          password: '{{ vcenter_password }}'
+          validate_certs: '{{ vcenter_validate_certs }}'
+          name: '{{ vmware_vm_name }}'
+          datacenter: '{{ vmware_vm_datacenter }}'
+          disk: '{{ vmware_vm_add_disks }}'
+
+    when: vmware_vm_add_disks|length > 0
+
+  # This task requires vsphere-automation-sdk-python in addition to PyVmomi library
+  - name: Assign tags to Virtual Machine
+    vmware_tag_manager:
+      hostname: '{{ vcenter_hostname }}'
+      username: '{{ vcenter_username }}'
+      password: '{{ vcenter_password }}'
+      validate_certs: '{{ vcenter_validate_certs }}'
+      tag_names: '{{ vmware_vm_tags }}'
+      object_type: VirtualMachine
+      object_name: '{{ vmware_vm_name }}'
+    when: vmware_vm_tags|length > 0
+
+  - name: Power on newly deployed Virtual Machine
+    vmware_guest_powerstate:
+      hostname: '{{ vcenter_hostname }}'
+      username: '{{ vcenter_username }}'
+      password: '{{ vcenter_password }}'
+      validate_certs: '{{ vcenter_validate_certs }}'
+      name: '{{ vmware_vm_name }}'
+      state: powered-on
+      state_change_timeout: 60
+
+  delegate_to: localhost

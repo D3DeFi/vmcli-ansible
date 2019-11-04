@@ -1,0 +1,11 @@
+---
+# vars file for vmware_vm role
+
+# mapping that helps to keep track of guest ids based on VM templates so user don't need to fill it manually
+#! required for vmware_guest module
+# add more mappings based on OS templates supported by you
+# https://code.vmware.com/en/apis/196/vsphere/doc/vim.vm.GuestOsDescriptor.GuestOsIdentifier.html
+vmware_vm_guestid_mappings:
+  debian9-template: debian9_64Guest
+  centos7-template: centos7_64Guest
+  ubuntu18-template: ubuntu64Guest

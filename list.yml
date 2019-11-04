@@ -1,0 +1,105 @@
+- hosts: localhost
+  connection: local
+  gather_facts: False
+  vars_files:
+    - vars/vcenter-logins.yml
+
+  pre_tasks:
+    - import_tasks: tasks/validate-inputs.yml
+
+  tasks:
+    - name: Retrieve datacenter information
+      vmware_objectlist_info:
+        hostname: '{{ vcenter_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        validate_certs: '{{ vcenter_validate_certs }}'
+        type: datacenter
+      register: datacenter_listing
+      tags:
+        - datacenter
+
+    - debug:
+        var: datacenter_listing
+      tags:
+        - datacenter
+
+    - name: Retrieve cluster information
+      vmware_objectlist_info:
+        hostname: '{{ vcenter_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        validate_certs: '{{ vcenter_validate_certs }}'
+        type: cluster
+      register: cluster_listing
+      tags:
+        - cluster
+
+    - debug:
+        var: cluster_listing
+      tags:
+        - cluster
+
+    - name: Retrieve datastore information
+      vmware_objectlist_info:
+        hostname: '{{ vcenter_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        validate_certs: '{{ vcenter_validate_certs }}'
+        type: datastore
+      register: datastore_listing
+      tags:
+        - datastore
+
+    - debug:
+        var: datastore_listing
+      tags:
+        - datastore
+
+    - name: Retrieve folder information
+      vmware_objectlist_info:
+        hostname: '{{ vcenter_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        validate_certs: '{{ vcenter_validate_certs }}'
+        type: folder
+      register: folder_listing
+      tags:
+        - folder
+
+    - debug:
+        var: folder_listing
+      tags:
+        - folder
+
+    - name: Retrieve resource pool information
+      vmware_objectlist_info:
+        hostname: '{{ vcenter_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        validate_certs: '{{ vcenter_validate_certs }}'
+        type: resource_pool
+      register: resource_pool_listing
+      tags:
+        - resource_pool
+
+    - debug:
+        var: resource_pool_listing
+      tags:
+        - resource_pool
+
+    - name: Retrieve network information
+      vmware_objectlist_info:
+        hostname: '{{ vcenter_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        validate_certs: '{{ vcenter_validate_certs }}'
+        type: network
+      register: network_listing
+      tags:
+        - network
+
+    - debug:
+        var: network_listing
+      tags:
+        - network

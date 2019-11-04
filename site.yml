@@ -1,0 +1,11 @@
+- hosts: managed_vms
+  connection: local
+  gather_facts: False
+  vars_files:
+    - vars/vcenter-logins.yml
+
+  pre_tasks:
+    - import_tasks: tasks/validate-inputs.yml
+
+  roles:
+    - vmware_vm

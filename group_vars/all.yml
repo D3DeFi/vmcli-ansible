@@ -1,0 +1,12 @@
+---
+# Vars file containing default values for each vcenter. These values can be overriden from user defined inventory
+# add more vcenters as needed, but make sure they have default values filled in
+vcenter_defaults: {}
+# Paste default values for your vCenters that you do not want to fill manually here in format:
+#  myvcenter1.eu-west:
+#   default_datacenter: DC01
+#   default_cluster: cl01
+#
+#  myvcenter2.eu-east:
+#   default_datacenter: DC02
+#   default_cluster: cl02

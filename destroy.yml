@@ -1,0 +1,37 @@
+- hosts: managed_vms
+  connection: local
+  gather_facts: False
+  vars_files:
+    - vars/vcenter-logins.yml
+
+  pre_tasks:
+    - import_tasks: tasks/validate-inputs.yml
+
+  tasks:
+    - name: Following VMs will be powered off and deleted
+      debug:
+        var: ansible_play_hosts
+      run_once: True
+
+    - name: Prompt user for confirmation
+      pause:
+        prompt: Are you sure you want to delete above mentioned VMs?
+
+    - name: Power off Virtual Machine
+      vmware_guest_powerstate:
+        hostname: '{{ vcenter_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        validate_certs: '{{ vcenter_validate_certs }}'
+        name: '{{ inventory_hostname }}'
+        state: powered-off
+        state_change_timeout: 60
+
+    - name: Delete Virtual Machine from vCenter
+      vmware_guest:
+        hostname: '{{ vcenter_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        validate_certs: '{{ vcenter_validate_certs }}'
+        name: '{{ inventory_hostname }}'
+        state: absent

@@ -16,42 +16,65 @@ user from (administrator) predefined defaults.
 Installation
 ------------
 
-Ansible is expected to be installed on your controller machine as well as vmware libraries for python:
+Ansible is expected to be installed on your controller machine. Install required VMware libraries for python with:
 
     pip install -r requirements.txt
 
-A few things have been implemented to ease the decision process for the user. If you plan to use this only by yourself
-then you can replace variables in `vars/vcenter-logins.yml` with your credentials.
 
-By default, vmcli-ansible tries to load default datacenter and cluster for specific vCenter in task file
-`tasks/validate-inputs.yml`, which retrieves it from static definition present in `group_vars/all.yml`.
-Make sure to edit these files and add more default values (e.g. datastore, rpool) as desired.
+Additional customization
+------------------------
 
-Next is the required `guest_id` that should match OS installed on the VM template. As this is usually something that I
-consider duplicate with the template option, matching guest ids are loaded from `roles/vmware_vm/vars/main.yml` and
-should be configured only once before using this project.
+As `vmware_guest` module requires some options to be filled before spawning any VM. A few things have been
+implemented to ease the decision process for the end user by defaulting to the most common values
+(e.g. a smaller vCenter setup run with a single datacenter).
 
-Static IP addressing is assumed by default. This is loaded from VM extra config as guest os customizations doesn't
-support some distributions. Role `vmware_vm` configures the following directives in the VM extra config during its creation:
+### Default values
+
+An attempt is made to load default datacenter and cluster for vCenter you are targeting. These default
+values, however, needs to be configured for the first time manually in:
+
+    tasks/validate-inputs.yml   # task file responsible for loading default values
+    group_vars/all.yml		    # static definition of default values, add more as desired
+
+You are encouraged to define additional default values (e.g. datastore, rpool) if possible for your setup or remove
+any existing ones from those files.
+
+### Parameter guest\_id is required
+
+Next is the required `guest_id` that should match OS installed on the VM template. This information usually changes
+with the template itself, which should not be that often, thus a static mapping of template <-> guest\_id is kept
+in the vmware\_vm role itself and it should be adjusted by the user when setting up this repository:
+
+	roles/vmware_vm/vars/main.yml
+
+### Static IP addressing
+
+Static IP addressing is assumed by default as it is harder to provision VM with when compared to DHCP. Configuration
+is not achieved via vmtools guest os customizations feature due to the fact that VMware doesn't support all popular
+distributions.
+
+Instead, a few variables are written to VM's extra config, which are then loaded via first boot provisioning script
+enabled inside the template. This feature will natively work with
+[vmcli-provision-scripts](https://github.com/D3DeFi/vmcli-provision-scripts)
+or you can develop your own version that suits your needs.
+
+Role `vmware_vm` configures the following directives in the VM extra config during its creation:
 
     guestinfo.provision.enabled: true
     guestinfo.provision.network.address: '{{ vmware_vm_ip_cidr }}'
     guestinfo.provision.network.gateway: '{{ vmware_vm_ip_gw }}'
 
-If this feature is not required,`guestinfo.provision.enabled` should simply be set to `false` or whole extra config
+If this feature is not required, `guestinfo.provision.enabled` should simply be set to `false` or whole extra config
 should be completely removed from `roles/vmware_vm/tasks/main.yml` file.
 
-In order to make static IP addressing work, templates should have custom provisioning script present on themselves.
-This feature will natively work with [vmcli-provision-scripts](https://github.com/D3DeFi/vmcli-provision-scripts)
-or you can develop your own version that suits your needs.
 
 How To
 ------
 
-Everything deployed will derive from inventory you provide to the playbooks. Start by looking at the inventory.yml
-present in this project and consult `roles/vmware_vm/README.md` for any configurable options. Additional groups of
-hosts can be created under managed\_vms group. This for example allows user to spawn VMs simultaneously on multiple
-vCenters.
+Everything deployed will derive from inventory you provide to the playbooks. Start by looking at the `inventory.yml`
+present in this project and then consult `roles/vmware_vm/README.md` for any additional configurable options.
+More groups of hosts can be created under managed\_vms group. This for example allows user to spawn VMs simultaneously
+on multiple vCenters.
 
 Login information is expected to come from one of the following sources:
 

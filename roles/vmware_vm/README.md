@@ -16,9 +16,9 @@ Following is the listing of variables and their default values (if present).
 
 This role expects login information to be set either via ENV variables or from playbook:
 
-    vcenter_hostname:  # or VMWARE_HOST env variable
-    vcenter_username:  # or VMWARE_USER env variable
-    vcenter_password:  # or VMWARE_PASSWORD env variable
+    vcenter_hostname:           # or VMWARE_HOST env variable
+    vcenter_username:           # or VMWARE_USER env variable
+    vcenter_password:           # or VMWARE_PASSWORD env variable
     vcenter_validate_certs: True
 
 Variables configuring VM creation and placement:

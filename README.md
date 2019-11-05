@@ -34,7 +34,7 @@ An attempt is made to load default datacenter and cluster for vCenter you are ta
 values, however, needs to be configured for the first time manually in:
 
     tasks/validate-inputs.yml   # task file responsible for loading default values
-    group_vars/all.yml		    # static definition of default values, add more as desired
+    group_vars/all.yml          # static definition of default values, add more as desired
 
 You are encouraged to define additional default values (e.g. datastore, rpool) if possible for your setup or remove
 any existing ones from those files.

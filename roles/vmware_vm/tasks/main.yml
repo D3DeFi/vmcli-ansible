@@ -1,4 +1,4 @@
---
+---
 # main.yml tasks file for vmware_vm role
 - block:
   - name: Fail if Virtual Machine already exists

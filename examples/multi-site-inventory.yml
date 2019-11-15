@@ -1,0 +1,54 @@
+managed_vms:
+  vars:
+    vmware_vm_template: ubuntu18-template
+    vmware_vm_datastore: DS-cl01
+    vmware_vm_networks:
+      - name: TEST-NET-1
+    vmware_vm_folder: /Test/example01/ansible_vms/
+    vmware_vm_resource_pool: ansbible-test-rpool
+    vmware_vm_ip_gw: 10.1.1.1
+    vmware_vm_cpus: 2
+    vmware_vm_memory_mb: 1024
+
+  children:
+    eu-east:
+      vars:
+        vcenter_hostname: eu-east.vcenter.example.com
+
+      hosts:
+        ansible-test01:
+          vmware_vm_ip_cidr: 10.1.1.2/24
+          vmware_vm_template: debian9-template
+
+        ansible-test02:
+          vmware_vm_ip_cidr: 10.1.1.3/24
+          vmware_vm_networks:
+            - name: TEST-NET-1
+            - name: EXAMPLE-VLAN-2
+              device_type: e1000
+
+        ansible-test03:
+          vmware_vm_ip_cidr: 10.1.1.4/24
+          vmware_vm_cpus: 1
+          vmware_vm_memory_mb: 1536
+
+        ansible-test04:
+          vmware_vm_ip_cidr: 10.1.1.5/24
+          vmware_vm_tags:
+            - myTag
+
+        ansible-test05:
+          vmware_vm_ip_cidr: 10.1.1.6/24
+          vmware_vm_add_disks:
+            - size_gb: 32
+            - size_tb: 1
+              datastore: BigDatastore01
+              type: thick
+
+    eu-west:
+      vars:
+        vcenter_hostname: eu-west.vcenter.example.com
+
+      hosts:
+        # it is assumed that these VMs will be provisioned via DHCP
+        ansible-test[06:10]:

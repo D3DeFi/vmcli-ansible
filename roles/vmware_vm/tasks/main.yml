@@ -2,7 +2,7 @@
 # main.yml tasks file for vmware_vm role
 - block:
   - name: Fail if Virtual Machine already exists
-    vmware_guest_facts:
+    vmware_guest_info:
       hostname: '{{ vcenter_hostname }}'
       username: '{{ vcenter_username }}'
       password: '{{ vcenter_password }}'
@@ -13,9 +13,14 @@
       properties:
         - config.name
         - config.instanceUuid
-    failed_when: __existing_vm_facts.instance is defined
+    failed_when: __existing_vm_info.instance is defined
     when: not vmware_vm_update_existing|bool
-    register: __existing_vm_facts
+    register: __existing_vm_info
+
+  - name: Fail if provided template was not found in guest id mappings
+    fail:
+      msg: 'Template {{ vmware_vm_template }} not defined in `vmware_vm_guestid_mappings`'
+    when: vmware_vm_template not in vmware_vm_guestid_mappings.keys()|list
 
   - name: Deploy Virtual Machine on vCenter
     vmware_guest:

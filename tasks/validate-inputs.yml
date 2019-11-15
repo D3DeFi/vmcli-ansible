@@ -16,5 +16,11 @@
 
 - name: Load default values for vars that were not provided
   set_fact:
-    vmware_vm_datacenter: "{{ vmware_vm_datacenter|default(vcenter_defaults[vcenter_hostname]['default_datacenter']) }}"
-    vmware_vm_cluster: "{{ vmware_vm_cluster|default(vcenter_defaults[vcenter_hostname]['default_cluster']) }}"
+    vmware_vm_datacenter: "{{ vmware_vm_datacenter|default(vcenter_defaults[vcenter_hostname]['default_datacenter'], True) }}"
+    vmware_vm_cluster: "{{ vmware_vm_cluster|default(vcenter_defaults[vcenter_hostname]['default_cluster'], True) }}"
+  when:
+    - vcenter_defaults is defined
+    - vcenter_hostname in vcenter_defaults.keys()|list
+  failed_when: >
+    vmware_vm_datacenter is not defined or vmware_vm_datacenter|length == 0 or
+    vmware_vm_cluster is not defined or vmware_vm_cluster|length == 0

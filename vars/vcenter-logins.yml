@@ -1,6 +1,6 @@
 ---
 # vars file with definition of login variables
-vcenter_hostname: "{{ lookup('env', 'VMWARE_HOST') or vmware_vcenter }}"
+vcenter_hostname: "{{ lookup('env', 'VMWARE_HOST') | default(vmware_vcenter, True) }}"
 vcenter_username: "{{ lookup('env', 'VMWARE_USER') }}"
 vcenter_password: "{{ lookup('env', 'VMWARE_PASSWORD') }}"
 vcenter_validate_certs: True

@@ -8,3 +8,8 @@
 env
 debug.yml
 test.yml
+__pycache__
+
+inventory/
+!inventory/single-site-inventory.yml
+!inventory/multi-site-inventory.yml

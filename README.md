@@ -72,12 +72,12 @@ How To
 ------
 
 Everything deployed will derive from inventory you provide to the playbooks. Start by looking at the inventory examples
-present in `examples/` folder and then consult `roles/vmware_vm/README.md` for any additional configurable options.
+present in `inventory/` folder and then consult `roles/vmware_vm/README.md` for any additional configurable options.
 More groups of hosts can be created under managed\_vms group. This for example allows user to spawn VMs simultaneously
 on multiple vCenters.
 
-    cp examples/single-site-inventory.yml myinventory.yml
-    vim myinventory.yml
+    cp inventory/single-site-inventory.yml inventory/myinventory.yml
+    vim inventory/myinventory.yml
 
 Login information is expected to come from one of the following sources:
 
@@ -96,11 +96,11 @@ VMs are deployed running the following command (this example uses ENV variables 
     export VMWARE_HOST=vcenter01.example.com
     export VMWARE_USER=admin
     export VMWARE_PASSWORD=mypass
-    ansible-playbook site.yml -i myinventory.yml
+    ansible-playbook site.yml -i inventory/myinventory.yml
 
 There is also a playbook for VM destroy:
 
-    ansible-playbook destroy.yml -i myinventory.yml
+    ansible-playbook destroy.yml -i inventory/myinventory.yml
 
 Author Information
 ------------------

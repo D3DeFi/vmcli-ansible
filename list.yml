@@ -6,8 +6,39 @@
 
   pre_tasks:
     - import_tasks: tasks/validate-inputs.yml
+      tags:
+        - always
+
+    - name: Fail if vmware_vm_name is not provided with vm tag
+      fail:
+        msg: '-e vmware_vm_name=VM is required when --tags vm is used'
+      when:
+        - "'vm' in ansible_run_tags"
+        - (vmware_vm_name is not defined or vmware_vm_name|length == 0)
+      tags:
+        - always
 
   tasks:
+    - name: Retrieve specific VM information
+      vmware_guest_info:
+        hostname: '{{ vcenter_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        validate_certs: '{{ vcenter_validate_certs }}'
+        name: '{{ vmware_vm_name }}'
+        datacenter: '{{ vmware_vm_datacenter }}'
+        schema: summary
+      register: vm_info
+      tags:
+        - vm
+        - never
+
+    - debug:
+        var: vm_info
+      tags:
+        - vm
+        - never
+
     - name: Retrieve datacenter information
       vmware_objectlist_info:
         hostname: '{{ vcenter_hostname }}'
@@ -81,12 +112,12 @@
         type: resource_pool
       register: resource_pool_listing
       tags:
-        - resource_pool
+        - rpool
 
     - debug:
         var: resource_pool_listing
       tags:
-        - resource_pool
+        - rpool
 
     - name: Retrieve network information
       vmware_objectlist_info:

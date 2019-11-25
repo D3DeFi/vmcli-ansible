@@ -89,6 +89,7 @@ Login information is expected to come from one of the following sources:
 
 VMware requires a few options before it can deploy anything, such information can be gathered by running:
 
+    ansible-playbook list.yml --list-tags
     ansible-playbook list.yml --tags datastore -e vcenter_hostname=vcenter01.example.com -e vcenter_username=admin
 
 VMs are deployed running the following command (this example uses ENV variables instead):
